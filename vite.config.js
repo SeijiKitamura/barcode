@@ -1,4 +1,5 @@
+import { defineConfig } from 'vite';
 export default defineConfig({
-  base: 'https://SeijiKitamura.github.io/barcode',
+  base: '/barcode/',
 });
 
