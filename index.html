@@ -11,13 +11,12 @@
     <div class="container">
       <div class="row">
         <div class="col-12">
-          <div id="app">
-          </div>
+          <h1 class="h1 text-center">Barcode Reader</h1>
         </div>
 
-        <div class="col-9">
-          <video id="video-capture" style="width: 100%;max-width: fit-content;display: block;margin-inline: auto;" autoplay></video>
-          <select id="cameras"></select>
+        <div class="col-12">
+          <video id="video-capture" class="hide-element" style="width: 100%;max-width: fit-content;display: none;margin-inline: auto;" autoplay></video>
+          <select id="cameras" class="hide-element"></select>
           <div id="result"></div>
           <button id="scan" class="btn btn-sm btn-outline-primary">スキャン</button>
         </div>
