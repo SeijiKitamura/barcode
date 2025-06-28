@@ -1,86 +1,64 @@
 import { BarcodeDetector } from "barcode-detector/ponyfill";
 globalThis.BarcodeDetector ??= BarcodeDetector;
 
-export default class Barcode {
-  static getSupportedFormats() {
-    return BarcodeDetector.getSupportedFormats();
+// 動画開始
+export async function videoStart(element, deviceId = "") {
+  const setting = { audio: false,
+                    video: { width: 1280,
+                             height: 720,
+                             facingMode: "environment",
+                             deviceId: deviceId, },
+                  }
+  navigator.mediaDevices.getUserMedia(setting)
+                        .then((mediaStream) => {
+                          element.srcObject = mediaStream
+                        });
+
+}
+
+// 端末に接続されているカメラを取得
+export async function getCameras() {
+  return navigator.mediaDevices
+                  .enumerateDevices()
+                  .then((devices) => devices.filter((device) => device.kind === "videoinput")
+                                            .map((device) => [device.deviceId, device.label]))
+}
+
+// select boxを作成
+export async function createCameraBox(element = "") {
+  const cameras = await getCameras();
+  cameras.forEach((camera) => {
+    const option = document.createElement("option");
+    option.value = camera[0]
+    option.textContent = camera[1]
+    element.appendChild(option)
+  })
+}
+
+// バーコードスキャン
+export async function scanBarcode(element, formats, interval, resultEl){
+  element.style.display = "block"
+  console.log("scan start(element: "+ element.id +", formats:" + formats.join(",") + " interval: " + interval + " resultEl: " + resultEl.id +")")
+  try{
+    const barcodeDetector = new BarcodeDetector({ formats: formats });
+    const results = await barcodeDetector.detect(element)
+    if (Array.isArray(results)) {
+      if (results.length == 0) { throw new Error("未検出") } 
+      else { 
+        element.style.display = "none";
+        showResult(resultEl, results[0])
+        return
+      }
+    }   
   }
-//    return BarcodeDetector.getSupportedFormats();
-//  }
-//
-//  // videoの横幅はCSSで変更する
-//  static setCamera(deviceId = "") {
-//    const setting = { audio: false,
-//                      video: { width: 1280,
-//                               height: 720,
-//                               facingMode: "environment",
-//                               deviceId: deviceId, },
-//                    }
-//
-//    const videoCaptureEl = document.getElementById("video-capture");
-//    navigator.mediaDevices.getUserMedia(setting)
-//                          .then((mediaStream) => {
-//                            videoCaptureEl.srcObject = mediaStream
-//                          });
-//
-//  }
-//
-//  // 先に画像を表示しておかないとlabelとdeviceIdが取得できない
-//  static getCameras() {
-//    const cameras = navigator.mediaDevices
-//                             .enumerateDevices()
-//    return cameras.filter((camera) => camera.kind == "videoinput")
-//                  .map((camera) => [ camera.deviceId, camera.label ])
-//  }
-//
-//  static setCamerasEl(selectId) {
-//    const selectEl = document.getElementById(selectId)
-//    if (! selectEl) {
-//      throw new Error('Selectタグがありません。');
-//    }
-//
-//    const cameras = Barcode.getCameras();
-//    // カメラがない場合のエラー処理をここに追加
-//    if(! cameras) {
-//      throw new Error('お使いの端末にはカメラがありません。');
-//    }
-// 
-//    selectEl.innerHTML = "";
-//    cameras.forEach(camera => {
-//      const option = document.createElement("option");
-//      option.value = camera[0]
-//      option.textContent = camera[1]
-//      selectEl.appendChild(option)
-//    })
-//  }
-//
-//  constructor(formats, barcodeDetector = undefined){
-//    this.barcodeDetector = new BarcodeDetector({ formats: formats })
-//    Barcode.setCamera();
-//  }
-//
-//  detect(source) {
-//    console.log(source)
-//    const result = ""
-//    this.barcodeDetector.detect(source)
-//    .then((data) => {
-//       result = data
-//    })
-//    .catch((error) =>{
-//      console.log(error)
-//    })
-//    return result
-//  }
-//
-//  scan(){
-//    console.log("scan start")
-//    const source = document.getElementById("video-capture");
-//     this.detect(source)
-//    const barcodeValue = barcode?.rawValue ?? ""
-//    if (!barcodeValue) {
-//      setTimeout(() => this.scan(this.videoCaptureEl), 1000)
-//      return
-//    }
-//    console.log("scan end")
-//  }
+  catch(error){
+    //console.log(error)
+    setTimeout(() => scanBarcode(element, formats, interval, resultEl), interval);
+  }
+}
+
+// 結果表示
+export async function showResult(element, result =[]) {
+  // elementがinputの場合はinnerTextをvalueに変更する
+  element.innerText = result["rawValue"]
 }
