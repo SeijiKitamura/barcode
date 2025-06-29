@@ -1,5 +1,6 @@
 import {
   videoStart,
+  videoStop,
   createCameraBox,
   scanBarcode,
   showResult,
@@ -11,6 +12,7 @@ const videoCaptureEl = document.getElementById(
 ) as HTMLVideoElement;
 const camerasEl = document.getElementById("cameras")!;
 const scanBtn = document.getElementById("scan")!;
+const cancelBtn = document.getElementById("cancel")!;
 const resultEl = document.getElementById("result")!;
 const barcodeFormats = ["ean_8", "ean_13", "upc_a", "upc_e"];
 const intervalTime: number = 500;
@@ -36,6 +38,12 @@ const intervalTime: number = 500;
     resultEl.innerText = "";
     toggleElements(".hide-element", "block");
     loop_scan(videoCaptureEl, barcodeFormats, intervalTime, resultEl);
+  });
+
+  // キャンセルボタン
+  cancelBtn.addEventListener("click", () => {
+    videoStop();
+    toggleElements(".hide-element", "none");
   });
 
   // 未検出だった場合ループする。

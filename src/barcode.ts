@@ -1,4 +1,5 @@
 import { BarcodeDetector } from "barcode-detector/ponyfill";
+let stream: MediaStream;
 
 // 動画開始
 export async function videoStart(
@@ -15,8 +16,17 @@ export async function videoStart(
     },
   };
   navigator.mediaDevices.getUserMedia(setting).then((mediaStream) => {
+    stream = mediaStream;
     element.srcObject = mediaStream;
+    element.play();
   });
+}
+
+// 動画停止
+export async function videoStop(){
+  if(stream) {
+    stream.getTracks().forEach((truck) => { truck.stop() });
+  }
 }
 
 // 端末に接続されているカメラを取得
@@ -33,12 +43,12 @@ export async function getCameras(): Promise<string[][]> {
 // select boxを作成
 export async function createCameraBox(element: HTMLElement): Promise<void> {
   const cameras = await getCameras();
-  cameras.forEach((camera) => {
-    const option = document.createElement("option");
-    option.value = camera[0];
-    option.textContent = camera[1];
-    element.appendChild(option);
-  });
+  await cameras.forEach((camera) => {
+          const option = document.createElement("option");
+          option.value = camera[0];
+          option.textContent = camera[1];
+          element.appendChild(option);
+        });
 }
 
 // バーコードスキャン
@@ -47,7 +57,7 @@ export async function scanBarcode(
   element: HTMLVideoElement,
   formats: any
 ): Promise<any> {
-  element.style.display = "block";
+  if(stream["active"] === false) { return; }
   console.log(
     "scan start(element: " + element.id + ", formats:" + formats.join(",") + ")"
   );
@@ -81,9 +91,9 @@ export async function showResult(
 // video要素とselect要素の表示・非表示
 export async function toggleElements(
   clsname: string,
-  swith: string
+  flg: string
 ): Promise<void> {
   document.querySelectorAll(clsname).forEach((element: any) => {
-    element.style.display = swith;
+    element.style.display = flg;
   });
 }
