@@ -1,6 +1,6 @@
 import { BarcodeDetector } from "barcode-detector/ponyfill";
-let stream: MediaStream;
 
+let stream: MediaStream;
 // 動画開始
 export async function videoStart(
   element: HTMLVideoElement,
@@ -18,7 +18,6 @@ export async function videoStart(
   navigator.mediaDevices.getUserMedia(setting).then((mediaStream) => {
     stream = mediaStream;
     element.srcObject = mediaStream;
-    element.play();
   });
 }
 
@@ -26,6 +25,17 @@ export async function videoStart(
 export async function videoStop(){
   if(stream) {
     stream.getTracks().forEach((truck) => { truck.stop() });
+  }
+}
+
+// 動画状態
+export function videoStatus(){
+  try {
+    if(stream && stream["active"] == true) {
+      return true
+    }
+  } catch(error){
+    return false
   }
 }
 
@@ -57,7 +67,6 @@ export async function scanBarcode(
   element: HTMLVideoElement,
   formats: any
 ): Promise<any> {
-  if(stream["active"] === false) { return; }
   console.log(
     "scan start(element: " + element.id + ", formats:" + formats.join(",") + ")"
   );

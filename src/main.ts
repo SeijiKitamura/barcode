@@ -1,6 +1,7 @@
 import {
   videoStart,
   videoStop,
+  videoStatus,
   createCameraBox,
   scanBarcode,
   showResult,
@@ -37,6 +38,7 @@ const intervalTime: number = 500;
   scanBtn.addEventListener("click", () => {
     resultEl.innerText = "";
     toggleElements(".hide-element", "block");
+    videoStart(videoCaptureEl, camerasEl.value);
     loop_scan(videoCaptureEl, barcodeFormats, intervalTime, resultEl);
   });
 
@@ -53,6 +55,7 @@ const intervalTime: number = 500;
     intarval: number,
     resultElement: HTMLElement
   ) {
+    if(!videoStatus()){ return };
     const barcode = await scanBarcode(element, formats);
     if (
       !Array.isArray(barcode) ||
