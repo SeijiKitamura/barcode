@@ -15,7 +15,7 @@ export async function videoStart(
       deviceId: deviceId,
     },
   };
-  navigator.mediaDevices.getUserMedia(setting).then((mediaStream) => {
+  await navigator.mediaDevices.getUserMedia(setting).then((mediaStream) => {
     stream = mediaStream;
     element.srcObject = mediaStream;
   });
@@ -31,9 +31,9 @@ export async function videoStop(){
 // 動画状態
 export function videoStatus(){
   try {
-    if(stream && stream["active"] == true) {
+    if(stream && stream["active"] && stream["active"] == true) {
       return true
-    }
+    }else { false }
   } catch(error){
     return false
   }

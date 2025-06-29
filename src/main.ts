@@ -32,6 +32,7 @@ const intervalTime: number = 500;
   camerasEl.addEventListener("change", (e: Event) => {
     const target = e.target as HTMLSelectElement;
     videoStart(videoCaptureEl, target.value);
+    loop_scan(videoCaptureEl, barcodeFormats, intervalTime, resultEl);
   });
 
   // scanボタン投下
@@ -55,7 +56,7 @@ const intervalTime: number = 500;
     intarval: number,
     resultElement: HTMLElement
   ) {
-    if(!videoStatus()){ return };
+    if(videoStatus() == undefined ){ return };
     const barcode = await scanBarcode(element, formats);
     if (
       !Array.isArray(barcode) ||
