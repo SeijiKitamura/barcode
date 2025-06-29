@@ -13,7 +13,7 @@ export async function videoStart(
     video: {
       width: 1280,
       height: 720,
-      facingMode: "environment",
+      //facingMode: "environment",
       deviceId: deviceId,
     },
   };
@@ -46,13 +46,23 @@ export async function getCameras(): Promise<string[][]> {
 // select boxを作成
 export async function createCameraBox(element: HTMLSelectElement): Promise<void> {
   const cameras = await getCameras();
-  if(element.options.length == 0){
-    await cameras.forEach((camera) => {
-            const option = document.createElement("option");
-            option.value = camera[0];
-            option.textContent = camera[1];
-            element.appendChild(option);
-          });
+  if(element && element.options && element.options.length == 0){
+    cameras.forEach((camera) => {
+      const option = document.createElement("option");
+      option.value = camera[0];
+      option.textContent = camera[1];
+      element.appendChild(option);
+    });
+    selectedCamera(element)
+  }
+}
+
+export async function selectedCamera(element: HTMLSelectElement): void {
+  const stream = await navigator.mediaDevices.getUserMedia({video: true});
+  const track = stream.getVideoTracks()[0];
+  const deviceId = track.getSettings().deviceId;
+  if(element.value != deviceId) {
+    element.value = deviceId
   }
 }
 
@@ -68,7 +78,7 @@ export async function scanBarcode(
     "scan start(element: " + element.id + ", formats:" + formats.join(",") + ")"
   );
   try {
-    if (!flg) { return  }
+    if (!flg) { return  flg = true }
     const barcodeDetector = new BarcodeDetector({ formats: formats });
     const results = await barcodeDetector.detect(element);
     if (Array.isArray(results)) {

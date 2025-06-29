@@ -4,6 +4,7 @@ import {
   createCameraBox,
   scanBarcode,
   toggleElements,
+  selectedCamera
 } from "./barcode";
 
 const videoCaptureEl = document.getElementById(
@@ -18,13 +19,8 @@ const intervalTime: number = 500;
 
 // 画面描写時に実行
 (async function () {
-  // 初期値で撮影開始
-  // (画面描写時にこれを実行しないとカメラリストが取得できない)
-  //videoStart(videoCaptureEl, "");
 
   toggleElements(".hide-element", "none");
-  // カメラセット
-  //createCameraBox(camerasEl);
 
   // カメライベントセット
   camerasEl.addEventListener("change", (e: Event) => {
