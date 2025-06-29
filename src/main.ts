@@ -24,6 +24,7 @@ const intervalTime: number = 500;
   // カメライベントセット
   camerasEl.addEventListener("change", (e: Event) => {
     const target = e.target as HTMLSelectElement;
+    // videoタグにdeviceIdをセット
     videoCaptureEl.setAttribute("data-deviceid", target.value)
     videoStart(videoCaptureEl);
   });
@@ -44,4 +45,7 @@ const intervalTime: number = 500;
 
   //videoタグにcamera#idをセット
   videoCaptureEl.setAttribute("data-cameras", camerasEl.id);
+
+  // selectタグにvideo#idをセット
+  camerasEl.setAttribute("data-video", videoCaptureEl.id)
 })();

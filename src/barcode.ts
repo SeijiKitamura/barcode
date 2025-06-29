@@ -21,6 +21,9 @@ export async function videoStart(
   await navigator.mediaDevices.getUserMedia(setting).then((mediaStream) => {
     stream = mediaStream;
     element.srcObject = mediaStream;
+    const track = mediaStream.getTracks()[0]
+    const deviceId = track.getSettings()["deviceId"] || "";
+    element.setAttribute("data-deviceid",deviceId)
   });
   flg = true;
 }
@@ -55,15 +58,15 @@ export async function createCameraBox(element: HTMLSelectElement): Promise<void>
       element.appendChild(option);
     });
   }
-}
-
-export async function selectedCamera(element: HTMLSelectElement): Promise<void> {
-  await createCameraBox(element)
-  const stream = await navigator.mediaDevices.getUserMedia({video: true});
-  const track = stream.getVideoTracks()[0];
-  const deviceId = track.getSettings().deviceId;
-  if(deviceId && element.value != deviceId) {
-    element.value = deviceId
+  const videoId = element.getAttribute("data-video");
+  if (videoId) {
+    const videoCaptureEl = document.getElementById(videoId);
+    if (videoCaptureEl) {
+      const deviceId = videoCaptureEl.getAttribute("data-deviceid");
+      if (deviceId && element.value != deviceId) {
+        element.value = deviceId;
+      }
+    }
   }
 }
 
@@ -81,7 +84,9 @@ export async function scanBarcode(
   const camerasId = element.getAttribute("data-cameras");
   if (camerasId) {
     const camerasEl = document.getElementById(camerasId) as HTMLSelectElement;
-    selectedCamera(camerasEl)
+    const deviceId = await element.getAttribute("data-deviceid") || ""
+    camerasEl.value = deviceId;
+    createCameraBox(camerasEl);
   }
 
   try {
