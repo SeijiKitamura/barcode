@@ -4,7 +4,6 @@ import {
   createCameraBox,
   scanBarcode,
   toggleElements,
-  selectedCamera
 } from "./barcode";
 
 const videoCaptureEl = document.getElementById(
@@ -25,15 +24,15 @@ const intervalTime: number = 500;
   // カメライベントセット
   camerasEl.addEventListener("change", (e: Event) => {
     const target = e.target as HTMLSelectElement;
-    videoStart(videoCaptureEl, target.value);
+    videoCaptureEl.setAttribute("data-deviceid", target.value)
+    videoStart(videoCaptureEl);
   });
 
   // scanボタン投下
   scanBtn.addEventListener("click", () => {
     toggleElements(".hide-element", "block");
-    videoStart(videoCaptureEl, "");
+    videoStart(videoCaptureEl);
     createCameraBox(camerasEl);
-    videoStart(videoCaptureEl, camerasEl.value);
     scanBarcode(videoCaptureEl, barcodeFormats, intervalTime, resultEl)
   });
 
@@ -42,4 +41,7 @@ const intervalTime: number = 500;
     videoStop();
     toggleElements(".hide-element", "none");
   });
+
+  //videoタグにcamera#idをセット
+  videoCaptureEl.setAttribute("data-cameras", camerasEl.id);
 })();

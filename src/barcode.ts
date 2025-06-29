@@ -5,9 +5,10 @@ let flg: boolean = true;
 
 // 動画開始
 export async function videoStart(
-  element: HTMLVideoElement,
-  deviceId: string = ""
+  element: HTMLVideoElement
 ): Promise<void> {
+  // deta-deviceidから現在のカメラを特定する
+  const deviceId = await element.getAttribute("data-deviceid") || ""
   const setting = {
     audio: false,
     video: {
@@ -53,15 +54,15 @@ export async function createCameraBox(element: HTMLSelectElement): Promise<void>
       option.textContent = camera[1];
       element.appendChild(option);
     });
-    selectedCamera(element)
   }
 }
 
-export async function selectedCamera(element: HTMLSelectElement): void {
+export async function selectedCamera(element: HTMLSelectElement): Promise<void> {
+  await createCameraBox(element)
   const stream = await navigator.mediaDevices.getUserMedia({video: true});
   const track = stream.getVideoTracks()[0];
   const deviceId = track.getSettings().deviceId;
-  if(element.value != deviceId) {
+  if(deviceId && element.value != deviceId) {
     element.value = deviceId
   }
 }
@@ -77,6 +78,12 @@ export async function scanBarcode(
   console.log(
     "scan start(element: " + element.id + ", formats:" + formats.join(",") + ")"
   );
+  const camerasId = element.getAttribute("data-cameras");
+  if (camerasId) {
+    const camerasEl = document.getElementById(camerasId) as HTMLSelectElement;
+    selectedCamera(camerasEl)
+  }
+
   try {
     if (!flg) { return  flg = true }
     const barcodeDetector = new BarcodeDetector({ formats: formats });
