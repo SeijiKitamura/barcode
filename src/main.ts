@@ -1,47 +1,24 @@
-import {
-  videoStart,
-  videoStop,
-  createCameraBox,
-  scanBarcode,
-  toggleElements,
-} from "./barcode";
-
-const videoCaptureEl = document.getElementById(
-  "video-capture"
-) as HTMLVideoElement;
-const camerasEl = document.getElementById("cameras") as HTMLSelectElement;
-const scanBtn = document.getElementById("scan")!;
-const cancelBtn = document.getElementById("cancel")!;
-const resultEl = document.getElementById("result")!;
+import { videoStart, videoStop, scanBarcode, toggleElements } from "./barcode";
 
 const barcodeFormats = ["ean_8", "ean_13", "upc_a", "upc_e"];
-const intervalTime: number = 500;
 
 // 画面描写時に実行
 (async function () {
-  toggleElements(".hide-element", "none");
-  //videoCaptureEl.setAttribute("data-cameras", camerasEl.id);
-  //camerasEl.setAttribute("data-video", videoCaptureEl.id);
+  // videoタグ非表示
+  toggleElements("none");
 
-  // カメライベントセット
-  camerasEl.addEventListener("change", (e: Event) => {
-    const target = e.target as HTMLSelectElement;
-    // videoタグにdeviceIdをセット
-    videoCaptureEl.setAttribute("data-deviceid", target.value);
-    videoStart(videoCaptureEl);
+  // カメラ変更イベント
+  document.getElementById("cameras")?.addEventListener("change", () => {
+    videoStart();
   });
 
-  // scanボタン投下
-  scanBtn.addEventListener("click", () => {
-    toggleElements(".hide-element", "block");
-    videoStart(videoCaptureEl);
-    createCameraBox(camerasEl);
-    scanBarcode(videoCaptureEl, barcodeFormats, intervalTime, resultEl);
+  // スキャンボタン
+  document.getElementById("scan")?.addEventListener("click", () => {
+    scanBarcode(barcodeFormats);
   });
 
   // キャンセルボタン
-  cancelBtn.addEventListener("click", () => {
-    videoStop(videoCaptureEl);
-    toggleElements(".hide-element", "none");
+  document.getElementById("cancel")?.addEventListener("click", () => {
+    videoStop();
   });
 })();
