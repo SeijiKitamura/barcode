@@ -13,14 +13,15 @@ const camerasEl = document.getElementById("cameras") as HTMLSelectElement;
 const scanBtn = document.getElementById("scan")!;
 const cancelBtn = document.getElementById("cancel")!;
 const resultEl = document.getElementById("result")!;
+
 const barcodeFormats = ["ean_8", "ean_13", "upc_a", "upc_e"];
 const intervalTime: number = 500;
 
 // 画面描写時に実行
 (async function () {
   toggleElements(".hide-element", "none");
-  videoCaptureEl.setAttribute("data-cameras", camerasEl.id);
-  camerasEl.setAttribute("data-video", videoCaptureEl.id);
+  //videoCaptureEl.setAttribute("data-cameras", camerasEl.id);
+  //camerasEl.setAttribute("data-video", videoCaptureEl.id);
 
   // カメライベントセット
   camerasEl.addEventListener("change", (e: Event) => {
@@ -40,7 +41,7 @@ const intervalTime: number = 500;
 
   // キャンセルボタン
   cancelBtn.addEventListener("click", () => {
-    videoStop();
+    videoStop(videoCaptureEl);
     toggleElements(".hide-element", "none");
   });
 })();
