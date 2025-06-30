@@ -4,11 +4,9 @@ let stream: MediaStream;
 let flg: boolean = true;
 
 // 動画開始
-export async function videoStart(
-  element: HTMLVideoElement
-): Promise<void> {
+export async function videoStart(element: HTMLVideoElement): Promise<void> {
   // deta-deviceidから現在のカメラを特定する
-  const deviceId = await element.getAttribute("data-deviceid") || ""
+  const deviceId = (await element.getAttribute("data-deviceid")) || "";
   const setting = {
     audio: false,
     video: {
@@ -21,17 +19,19 @@ export async function videoStart(
   await navigator.mediaDevices.getUserMedia(setting).then((mediaStream) => {
     stream = mediaStream;
     element.srcObject = mediaStream;
-    const track = mediaStream.getTracks()[0]
+    const track = mediaStream.getTracks()[0];
     const deviceId = track.getSettings()["deviceId"] || "";
-    element.setAttribute("data-deviceid",deviceId)
+    element.setAttribute("data-deviceid", deviceId);
   });
   flg = true;
 }
 
 // 動画停止
-export async function videoStop(){
-  if(stream) {
-    stream.getTracks().forEach((truck) => { truck.stop() });
+export async function videoStop() {
+  if (stream) {
+    stream.getTracks().forEach((truck) => {
+      truck.stop();
+    });
     flg = false;
   }
 }
@@ -48,9 +48,11 @@ export async function getCameras(): Promise<string[][]> {
 }
 
 // select boxを作成
-export async function createCameraBox(element: HTMLSelectElement): Promise<void> {
+export async function createCameraBox(
+  element: HTMLSelectElement
+): Promise<void> {
   const cameras = await getCameras();
-  if(element && element.options && element.options.length == 0){
+  if (element && element.options && element.options.length == 0) {
     cameras.forEach((camera) => {
       const option = document.createElement("option");
       option.value = camera[0];
@@ -84,29 +86,35 @@ export async function scanBarcode(
   const camerasId = element.getAttribute("data-cameras");
   if (camerasId) {
     const camerasEl = document.getElementById(camerasId) as HTMLSelectElement;
-    const deviceId = await element.getAttribute("data-deviceid") || ""
-    camerasEl.value = deviceId;
-    createCameraBox(camerasEl);
+    const deviceId = (await element.getAttribute("data-deviceid")) || "";
+    if(camerasEl && deviceId) {
+      createCameraBox(camerasEl);
+      camerasEl.value = deviceId;
+    }
   }
 
   try {
-    if (!flg) { return  flg = true }
+    if (!flg) {
+      return (flg = true);
+    }
     const barcodeDetector = new BarcodeDetector({ formats: formats });
     const results = await barcodeDetector.detect(element);
     if (Array.isArray(results)) {
       if (results.length == 0) {
         throw new Error("未検出");
       } else {
-        showResult(resultEl,results[0])
+        showResult(resultEl, results[0]);
         toggleElements(".hide-element", "none");
-        return 
+        return;
       }
     }
-  } 
-  catch (error) {
+  } catch (error) {
     // ページ表示直後にカメラが間に合わずエラーになるのでここで握りつぶす
     //console.log(error)
-    setTimeout(() => scanBarcode(element, formats, interval, resultEl), interval);
+    setTimeout(
+      () => scanBarcode(element, formats, interval, resultEl),
+      interval
+    );
   }
 }
 

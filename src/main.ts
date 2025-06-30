@@ -18,14 +18,15 @@ const intervalTime: number = 500;
 
 // 画面描写時に実行
 (async function () {
-
   toggleElements(".hide-element", "none");
+  videoCaptureEl.setAttribute("data-cameras", camerasEl.id);
+  camerasEl.setAttribute("data-video", videoCaptureEl.id);
 
   // カメライベントセット
   camerasEl.addEventListener("change", (e: Event) => {
     const target = e.target as HTMLSelectElement;
     // videoタグにdeviceIdをセット
-    videoCaptureEl.setAttribute("data-deviceid", target.value)
+    videoCaptureEl.setAttribute("data-deviceid", target.value);
     videoStart(videoCaptureEl);
   });
 
@@ -34,7 +35,7 @@ const intervalTime: number = 500;
     toggleElements(".hide-element", "block");
     videoStart(videoCaptureEl);
     createCameraBox(camerasEl);
-    scanBarcode(videoCaptureEl, barcodeFormats, intervalTime, resultEl)
+    scanBarcode(videoCaptureEl, barcodeFormats, intervalTime, resultEl);
   });
 
   // キャンセルボタン
@@ -42,10 +43,4 @@ const intervalTime: number = 500;
     videoStop();
     toggleElements(".hide-element", "none");
   });
-
-  //videoタグにcamera#idをセット
-  videoCaptureEl.setAttribute("data-cameras", camerasEl.id);
-
-  // selectタグにvideo#idをセット
-  camerasEl.setAttribute("data-video", videoCaptureEl.id)
 })();
