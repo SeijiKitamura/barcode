@@ -37,12 +37,19 @@ export async function videoStart(): Promise<void> {
   if (!element) {
     throw new Error("video要素がありません");
   }
-  // 撮影中なら処理終了
-  const stream: any = element.srcObject;
-  if (stream) return;
 
-  // deta-deviceidから現在のカメラを特定する
-  const deviceId = (await element.getAttribute("data-deviceid")) || "";
+  const cameraEl = document.getElementById("cameras") as HTMLSelectElement;
+  if (!cameraEl) {
+    throw new Error("select要素がありません");
+  }
+
+  // 選択したカメラを特定する
+  const deviceId = cameraEl.value || "";
+
+  // data-video-statusで撮影中を判断
+  const streaming = element.getAttribute("data-video-status");
+
+  // カメラ初期値をセット
   const setting = {
     audio: false,
     video: {
@@ -51,12 +58,23 @@ export async function videoStart(): Promise<void> {
     },
   };
 
+  // 撮影中でdeviceIdに変更がないなら処理終了
+  if (deviceId && streaming == "on") {
+    const stream: any = element.srcObject;
+    if (stream) {
+      const track = stream.getTracks();
+      if (track) {
+        const now_deviceId = track[0].getSettings()["deviceId"];
+        if (now_deviceId == deviceId) {
+          return;
+        }
+      }
+    }
+  }
+
   // elementにdata-device-idとdata-video-statusをセット
   await navigator.mediaDevices.getUserMedia(setting).then((mediaStream) => {
     element.srcObject = mediaStream;
-    const track = mediaStream.getTracks()[0];
-    const deviceId = track.getSettings()["deviceId"] || "";
-    element.setAttribute("data-deviceid", deviceId);
     element.setAttribute("data-video-status", "on");
   });
 }
@@ -113,7 +131,7 @@ export async function createCameraBox(): Promise<void> {
     throw new Error("select要素がありません");
   }
 
-  // videoタグのdata-deviceIdにdeviceIdをセット
+  // videoタグ存在チェック
   const videoCaptureEl = document.getElementById("video-capture");
   if (!videoCaptureEl) {
     throw new Error("video要素がありません");
@@ -133,15 +151,6 @@ export async function createCameraBox(): Promise<void> {
       option.textContent = camera[1];
       element.appendChild(option);
     });
-  }
-
-  try {
-    const deviceId = videoCaptureEl.getAttribute("data-deviceid");
-    if (deviceId && element.value != deviceId) {
-      element.value = deviceId;
-    }
-  } catch (error) {
-    console.log("video要素にdata-deviecidがありません");
   }
 }
 
@@ -175,18 +184,15 @@ export async function scanBarcode(
     throw new Error("select要素がありません");
   }
 
-  const deviceId = (await element.getAttribute("data-deviceid")) || "";
-  if (camerasEl && deviceId && camerasEl.value != deviceId) {
-    await createCameraBox();
-    camerasEl.value = deviceId;
-  }
-
   // offなら無限ループから抜けます
   if (element.getAttribute("data-video-status") === "off") {
     // onしておかないとキャンセルを押したとき再始動しない
     element.setAttribute("data-video-status", "on");
     return;
   }
+
+  // resultを初期化
+  resultEl.innerText = "";
 
   // video要要等を表示
   await toggleElements("block");
