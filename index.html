@@ -17,11 +17,28 @@
         <div class="col-6">
           <video id="video-capture" class="hide-element" style="width: 100%;max-width: fit-content;display: none;margin-inline: auto;" autoplay playsinline muted></video>
           <select id="cameras" class="hide-element"></select>
+          <div class="alert alert-secondary">
+             iPhoneをご利用の方へ
+             <p>
+                以下の設定をしていただくとカメラを選択できるようになります。
+                <ol>
+                  <li>設定を開く</li>
+                  <li>アプリを開く</li>
+                  <li>Safariを開く</li>
+                  <li>カメラを開く</li>
+                  <li>許可を選択する</li>
+                </ol>
+             </p>
+          </div>
         </div>
-        <div class="col-6">
-          <button id="scan" class="btn btn-sm btn-outline-primary">スキャン</button>
-          <button id="cancel" class="btn btn-sm btn-outline-secondary hide-element">キャンセル</button>
+        <div class="col-3">
           <div id="result"></div>
+        </div>
+        <div class="col-3">
+          <div class="d-grid gap-2 d-flex justify-content-end">
+            <button id="scan" class="btn btn-sm btn-outline-primary">スキャン</button>
+            <button id="cancel" class="btn btn-sm btn-outline-secondary hide-element">キャンセル</button>
+          </div>
         </div>
       </div>
     </div>
